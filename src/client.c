@@ -30,17 +30,16 @@ void _client_connect(client_t *self, const char* host, const char* service){
 void _client_encrypt_file(client_t *self,const char* method, const char* key){
     encoder_t encoder;
     if (encoder_init(&encoder, method, key)){
-        printf("Modo no soportado por el codificador\n");
-        printf("Elegir entre {cesar, vigenere, rc4}\n");
         exit(1);
     }
     FILE *fp = stdin;
     char buffer[CHUNK_SIZE + 1] = "\0";
+    char encrypted_msg[CHUNK_SIZE + 1] = "\0";
     int read = 1;
     while (read){
         read = _client_read_file(fp, buffer);
-        encoder_encrypt(&encoder, buffer);
-        _client_send_message(self, buffer);
+        encoder_encrypt(&encoder, buffer,encrypted_msg);
+        _client_send_message(self, encrypted_msg);
         memset(buffer,0,CHUNK_SIZE);
     }
 }
