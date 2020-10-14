@@ -34,13 +34,14 @@ void _client_encrypt_file(client_t *self,const char* method, const char* key){
     }
     FILE *fp = stdin;
     char buffer[CHUNK_SIZE + 1] = "\0";
-    char encrypted_msg[CHUNK_SIZE + 1] = "\0";
+    unsigned char encrypted_msg[CHUNK_SIZE + 1] = "\0";
     int read = 1;
+    int key_iterator = 0;
     while (read){
         read = _client_read_file(fp, buffer);
-        encoder_encrypt(&encoder, buffer,encrypted_msg);
-        _client_send_message(self, encrypted_msg);
-        memset(buffer,0,CHUNK_SIZE);
+        encoder_encrypt(&encoder, buffer,encrypted_msg,key_iterator);
+        _client_send_message(self, (char*) encrypted_msg);
+        memset(buffer,0,CHUNK_SIZE);                    //porque puede leer menos de 64 y quedar con basura
     }
 }
 
@@ -53,4 +54,9 @@ int _client_read_file(FILE *self, char *buffer){
 void _client_send_message(client_t *self, char *buffer){
     int bytes_sent = socket_send(&self->socket, buffer, CHUNK_SIZE+1);
     if (bytes_sent < 0) exit(EXIT_FAILURE);
+}
+
+
+void client_finish(client_t *self){
+    socket_finish(&self->socket);
 }
