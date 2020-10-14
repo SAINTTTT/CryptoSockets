@@ -14,6 +14,7 @@ void client_init(client_t *self, const char* host, const char* service){
 void client_run(client_t *self, const char* host, const char* service, const char* method, const char* key){
     client_init(self, host, service);
     _client_encrypt_file(self, method, key);
+    client_finish(self);
 
 }
 

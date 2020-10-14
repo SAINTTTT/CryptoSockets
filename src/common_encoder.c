@@ -68,3 +68,8 @@ void _encoder_sum_chars(char* msg, unsigned char* encrypted, const char *key, un
         key_iterator++;
     }
 }
+
+
+void encoder_decrypt(encoder_t *encoder, unsigned char *encrypted_msg, int key_iterator){
+    printf("%s", encrypted_msg);
+}

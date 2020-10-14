@@ -13,3 +13,5 @@ void _server_connect(server_t *self, const char *service);
 void server_run(server_t *self, const char *service, const char *method, const char *key);
 
 void server_finish(server_t *self);
+
+void server_decrypt(server_t *self, const char *method, const char *key);

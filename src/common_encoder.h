@@ -19,4 +19,6 @@ void _encoder_encrypt_vigenere(encoder_t* self, char *msg, unsigned char *encryp
 void _encoder_sum_chars(char* msg, unsigned char* encrypted, const char *key, unsigned int size_key, int key_iterator);
 
 const char* encoder_get_key(encoder_t *self);
+
+void encoder_decrypt(encoder_t *encoder, unsigned char *encrypted_msg, int key_iterator);
 #endif
