@@ -22,7 +22,7 @@ void client_run(client_t* self, const char* host, const char* service,
 void _client_connect(client_t* self, const char* host, const char* service) {
   int err = socket_connect(&self->socket, host, service);
   if (err < 0) {
-    // manejo de errores
+    client_finish(self);
     exit(1);
   }
 }
@@ -30,6 +30,7 @@ void _client_connect(client_t* self, const char* host, const char* service) {
 void _client_encrypt_file(client_t* self, const char* method, const char* key) {
   encoder_t encoder;
   if (encoder_init(&encoder, method, key)) {
+    client_finish(self);
     exit(1);
   }
   FILE* fp = stdin;
@@ -39,6 +40,7 @@ void _client_encrypt_file(client_t* self, const char* method, const char* key) {
   int key_iterator = 0;
   while (read) {
     read = _client_read_file(fp, buffer);
+    if (!read) break;
     encoder_encrypt(&encoder, buffer, encrypted_msg, key_iterator);
     _client_send_message(self, (char*)encrypted_msg);
     memset(buffer, 0,
@@ -53,7 +55,10 @@ int _client_read_file(FILE* self, char* buffer) {
 
 void _client_send_message(client_t* self, char* buffer) {
   int bytes_sent = socket_send(&self->socket, buffer, CHUNK_SIZE + 1);
-  if (bytes_sent < 0) exit(EXIT_FAILURE);
+  if (bytes_sent < 0) {
+    client_finish(self);
+    exit(EXIT_FAILURE);
+  }
 }
 
 void client_finish(client_t* self) {

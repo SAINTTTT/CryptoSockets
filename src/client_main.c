@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include <stdio.h>
 
 #include "client.h"
@@ -11,10 +12,20 @@ int main(int argc, char** argv) {
         "\n");
     return 1;
   }
+
   const char* host = argv[1];
   const char* service = argv[2];
-  const char* method = argv[3] + 9;  // ignoro --method=
-  const char* key = argv[4] + 6;     // ignoro --key=
+
+  struct option long_options[] = {
+      {"method", required_argument, 0, 0},
+      {"key", required_argument, 0, 0},
+  };
+
+  getopt_long(argc, argv, "host:service:--method:--key", long_options, &optind);
+  const char* method = optarg;
+  getopt_long(argc, argv, "host:service:--method:--key", long_options, &optind);
+  const char* key = optarg;
+
   client_run(&client, host, service, method, key);
 
   return 0;

@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include <stdio.h>
 
 #include "server.h"
@@ -10,8 +11,15 @@ int main(int argc, char** argv) {
     return 1;
   }
   const char* service = argv[1];
-  const char* method = argv[2] + 9;
-  const char* key = argv[3] + 6;
+  struct option long_options[] = {
+      {"method", required_argument, 0, 0},
+      {"key", required_argument, 0, 0},
+  };
+
+  getopt_long(argc, argv, "service:--method:--key", long_options, &optind);
+  const char* method = optarg;
+  getopt_long(argc, argv, "service:--method:--key", long_options, &optind);
+  const char* key = optarg;
   server_run(&server, service, method, key);
   return 0;
 }
