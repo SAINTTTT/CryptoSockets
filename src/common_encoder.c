@@ -16,7 +16,7 @@ int encoder_init(encoder_t *self, const char *method, const char *key) {
   }
 
   self->key = key;
-
+  self->key_iterator = 0;
   strncpy((char *)self->characters_rc4, "0", 256);
 
   self->i_status_rc4 = 0;
@@ -24,32 +24,30 @@ int encoder_init(encoder_t *self, const char *method, const char *key) {
   return 0;
 }
 
-void encoder_run(encoder_t *self, char *msg, unsigned char *result,
-                 int key_iterator, int mode, int readed) {
+void encoder_run(encoder_t *self, char *msg, unsigned char *result, int mode,
+                 int readed) {
   switch (encoder_get_method(self)) {
     case cesar:
-      _encoder_cesar(self, msg, result, key_iterator, mode, readed);
+      _encoder_cesar(self, msg, result, mode, readed);
       break;
     case rc4:
-      _encoder_rc4(self, msg, result, key_iterator);
+      _encoder_rc4(self, msg, result);
       break;
     default:
-      _encoder_vigenere(self, msg, result, key_iterator, mode, readed);
+      _encoder_vigenere(self, msg, result, mode, readed);
       break;
   }
   return;
 }
 
-void _encoder_cesar(encoder_t *self, char *msg, unsigned char *result,
-                    int key_iterator, int mode, int readed) {
+void _encoder_cesar(encoder_t *self, char *msg, unsigned char *result, int mode,
+                    int readed) {
   // convierto el "const char* key" en un "int" para sumar
   int key = atoi(encoder_get_key(self));
-  _encoder_sum_chars(msg, result, (const char *)&key, 1, key_iterator, mode,
-                     readed);
+  _encoder_sum_chars(self, msg, result, (const char *)&key, 1, mode, readed);
 }
 
-void _encoder_rc4(encoder_t *self, char *msg, unsigned char *result,
-                  int key_iterator) {
+void _encoder_rc4(encoder_t *self, char *msg, unsigned char *result) {
   memset(result, 0, CHUNK_SIZE_C);
   unsigned int i = self->i_status_rc4;
   unsigned int j = self->j_status_rc4;
@@ -96,10 +94,10 @@ void _encoder_swap(unsigned char *characters, unsigned int i, unsigned int j) {
 }
 
 void _encoder_vigenere(encoder_t *self, char *msg, unsigned char *result,
-                       int key_iterator, int mode, int readed) {
+                       int mode, int readed) {
   const char *key = encoder_get_key(self);
   unsigned int size_key = strlen(key);
-  _encoder_sum_chars(msg, result, key, size_key, key_iterator, mode, readed);
+  _encoder_sum_chars(self, msg, result, key, size_key, mode, readed);
 }
 
 const char *encoder_get_key(encoder_t *self) { return self->key; }
@@ -109,13 +107,14 @@ enum CODIFICATION encoder_get_method(encoder_t *self) {
 }
 
 //"mode" indica si es para encriptar (1) o desencriptar (-1) el mensaje
-void _encoder_sum_chars(char *msg, unsigned char *result, const char *key,
-                        unsigned int size_key, int key_iterator, int mode,
+void _encoder_sum_chars(encoder_t *self, char *msg, unsigned char *result,
+                        const char *key, unsigned int size_key, int mode,
                         int readed) {
   for (int i = 0; i < readed; i++) {
-    result[i] = (unsigned int)(msg[i] + (mode * key[key_iterator % size_key]));
+    result[i] =
+        (unsigned int)(msg[i] + (mode * key[self->key_iterator % size_key]));
     // asi se hace circular, por si se pasa de la z
     result[i] = result[i] % 256;
-    key_iterator++;
+    self->key_iterator++;
   }
 }

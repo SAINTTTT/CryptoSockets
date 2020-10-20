@@ -36,11 +36,10 @@ void _client_encrypt_file(client_t* self, const char* method, const char* key) {
   char buffer[CHUNK_SIZE_C + 1] = "\0";
   unsigned char encrypted_msg[CHUNK_SIZE_C + 1] = "\0";
   int read = 1;
-  int key_iterator = 0;
   while (!feof(stdin) || (read != 0)) {
     read = _client_read_file(stdin, buffer);
     if (read == 0) break;
-    encoder_run(&encoder, buffer, encrypted_msg, key_iterator, ENCRYPT, read);
+    encoder_run(&encoder, buffer, encrypted_msg, ENCRYPT, read);
     _client_send_message(self, (char*)encrypted_msg, read);
     memset(buffer, 0, CHUNK_SIZE_C);  // porque puede leer menos de 64
   }

@@ -37,14 +37,13 @@ void server_decrypt(server_t *self, const char *method, const char *key) {
   }
   unsigned char encrypted_msg[CHUNK_SIZE + 1] = "\0";
   unsigned char decrypted_msg[CHUNK_SIZE + 1] = "\0";
-  int key_iterator = 0;
   int bytes_recv = 1;
   while (bytes_recv != 0) {  // si es 0, cerraron el socket
     bytes_recv =
         socket_receive(&self->socket_peer, (char *)encrypted_msg, CHUNK_SIZE);
     if (!bytes_recv) break;
-    encoder_run(&encoder, (char *)encrypted_msg, decrypted_msg, key_iterator,
-                DECRYPT, bytes_recv);
+    encoder_run(&encoder, (char *)encrypted_msg, decrypted_msg, DECRYPT,
+                bytes_recv);
     fwrite(decrypted_msg, 1, bytes_recv, stdout);
     memset(encrypted_msg, 0, CHUNK_SIZE);
   }
