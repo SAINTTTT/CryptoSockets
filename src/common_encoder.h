@@ -2,6 +2,8 @@
 #define COMMON_ENCODER_H_
 #define ENCRYPT 1
 #define DECRYPT -1
+#define CHUNK_SIZE 64
+#define CHUNK_SIZE_C 64
 
 typedef struct {
   enum CODIFICATION { rc4, cesar, vigenere } codification;
@@ -14,19 +16,20 @@ typedef struct {
 int encoder_init(encoder_t *self, const char *method, const char *key);
 
 void encoder_run(encoder_t *self, char *msg, unsigned char *encrypted,
-                 int key_iterator, int mode);
+                 int key_iterator, int mode, int readed);
 
 void _encoder_cesar(encoder_t *self, char *msg, unsigned char *encrypted,
-                    int key_iterator, int mode);
+                    int key_iterator, int mode, int readed);
 
 void _encoder_rc4(encoder_t *self, char *msg, unsigned char *encrypted,
                   int key_iterator);
 
 void _encoder_vigenere(encoder_t *self, char *msg, unsigned char *encrypted,
-                       int key_iterator, int mode);
+                       int key_iterator, int mode, int readed);
 
 void _encoder_sum_chars(char *msg, unsigned char *encrypted, const char *key,
-                        unsigned int size_key, int key_iterator, int mode);
+                        unsigned int size_key, int key_iterator, int mode,
+                        int readed);
 
 const char *encoder_get_key(encoder_t *self);
 

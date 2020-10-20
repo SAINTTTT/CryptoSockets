@@ -19,7 +19,7 @@ void _client_connect(client_t* self, const char* host, const char* service);
 
 int _client_read_file(FILE* self, char* buffer);
 
-void _client_send_message(client_t* self, char* buffer);
+void _client_send_message(client_t* self, char* buffer, int readed);
 
 void _client_encrypt_file(client_t* self, const char* method, const char* key);
 

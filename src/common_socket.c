@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #define CANTIDAD_SOCKETS_LISTEN 20
+#define SOCKET_CLOSE 0
 
 void socket_init(tcp_socket_t* self, int mode) {
   self->fd = -1;
@@ -47,7 +48,10 @@ int socket_connect(tcp_socket_t* self, const char* host, const char* service) {
     err = connect(self->fd, ptr->ai_addr, ptr->ai_addrlen);
     if (err == -1) {
       printf("Error: %s\n", strerror(errno));
+    } else if (err == 0) {
+      break;
     }
+    close(self->fd);
   }
   freeaddrinfo(ai_list);
   return err;
@@ -88,7 +92,7 @@ int socket_accept(tcp_socket_t* self, tcp_socket_t* socket_accept) {
 int socket_send(tcp_socket_t* socket, const char* buffer, size_t size) {
   int bytes_sent = 0;
   while (bytes_sent < size) {
-    bytes_sent =
+    bytes_sent +=
         send(socket->fd, buffer + bytes_sent, size - bytes_sent, MSG_NOSIGNAL);
     if (bytes_sent < 0) {
       printf("Error in socket send: %s\n", strerror(errno));

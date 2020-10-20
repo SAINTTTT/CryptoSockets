@@ -6,8 +6,6 @@
 
 #include "common_encoder.h"
 
-#define CHUNK_SIZE 64
-
 void server_init(server_t *self, const char *service) {
   socket_init(&self->socket, 2);
   _server_connect(self, service);
@@ -42,12 +40,12 @@ void server_decrypt(server_t *self, const char *method, const char *key) {
   int key_iterator = 0;
   int bytes_recv = 1;
   while (bytes_recv != 0) {  // si es 0, cerraron el socket
-    bytes_recv = socket_receive(&self->socket_peer, (char *)encrypted_msg,
-                                CHUNK_SIZE + 1);
+    bytes_recv =
+        socket_receive(&self->socket_peer, (char *)encrypted_msg, CHUNK_SIZE);
     if (!bytes_recv) break;
     encoder_run(&encoder, (char *)encrypted_msg, decrypted_msg, key_iterator,
-                DECRYPT);
-    printf("%s", decrypted_msg);
+                DECRYPT, bytes_recv);
+    fwrite(decrypted_msg, 1, bytes_recv, stdout);
     memset(encrypted_msg, 0, CHUNK_SIZE);
   }
 }
