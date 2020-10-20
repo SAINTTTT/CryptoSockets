@@ -1,6 +1,7 @@
 #include "client.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "common_encoder.h"
@@ -23,7 +24,7 @@ void _client_connect(client_t* self, const char* host, const char* service) {
   int err = socket_connect(&self->socket, host, service);
   if (err < 0) {
     client_finish(self);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -31,7 +32,7 @@ void _client_encrypt_file(client_t* self, const char* method, const char* key) {
   encoder_t encoder;
   if (encoder_init(&encoder, method, key)) {
     client_finish(self);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   FILE* fp = stdin;
   char buffer[CHUNK_SIZE + 1] = "\0";
@@ -41,10 +42,9 @@ void _client_encrypt_file(client_t* self, const char* method, const char* key) {
   while (read) {
     read = _client_read_file(fp, buffer);
     if (!read) break;
-    encoder_encrypt(&encoder, buffer, encrypted_msg, key_iterator);
+    encoder_run(&encoder, buffer, encrypted_msg, key_iterator, ENCRYPT);
     _client_send_message(self, (char*)encrypted_msg);
-    memset(buffer, 0,
-           CHUNK_SIZE);  // porque puede leer menos de 64 y quedar con basura
+    memset(buffer, 0, CHUNK_SIZE);  // porque puede leer menos de 64
   }
 }
 

@@ -5,8 +5,6 @@
 #include <string.h>
 
 #define CHUNK_SIZE 64
-#define ENCRYPT 1
-#define DECRYPT -1
 
 int encoder_init(encoder_t *self, const char *method, const char *key) {
   if (strcmp(method, "cesar") == 0) {
@@ -21,27 +19,26 @@ int encoder_init(encoder_t *self, const char *method, const char *key) {
 
   self->key = key;
 
-  strncpy((char *)self->characters, "0", 256);
+  strncpy((char *)self->characters_rc4, "0", 256);
 
   self->i_status_rc4 = 0;
   self->j_status_rc4 = 0;
   return 0;
 }
 
-void encoder_encrypt(encoder_t *self, char *msg, unsigned char *encrypted,
-                     int key_iterator) {
+void encoder_run(encoder_t *self, char *msg, unsigned char *encrypted,
+                 int key_iterator, int mode) {
   switch (encoder_get_method(self)) {
     case cesar:
-      _encoder_cesar(self, msg, encrypted, key_iterator, ENCRYPT);
+      _encoder_cesar(self, msg, encrypted, key_iterator, mode);
       break;
     case rc4:
       _encoder_rc4(self, msg, encrypted, key_iterator);
       break;
     default:
-      _encoder_vigenere(self, msg, encrypted, key_iterator, ENCRYPT);
+      _encoder_vigenere(self, msg, encrypted, key_iterator, mode);
       break;
   }
-
   return;
 }
 
@@ -57,10 +54,10 @@ void _encoder_rc4(encoder_t *self, char *msg, unsigned char *encrypted,
   memset(encrypted, 0, CHUNK_SIZE);
   unsigned int i = self->i_status_rc4;
   unsigned int j = self->j_status_rc4;
-  if (strcmp((char *)self->characters, "0") == 0) {
-    _encoder_rc4_KSA(self, self->characters);
+  if (strcmp((char *)self->characters_rc4, "0") == 0) {
+    _encoder_rc4_KSA(self, self->characters_rc4);
   }
-  _encoder_rc4_PRGA(self, self->characters, msg, encrypted, i, j);
+  _encoder_rc4_PRGA(self, self->characters_rc4, msg, encrypted, i, j);
 }
 
 void _encoder_rc4_KSA(encoder_t *self, unsigned char *characters) {
@@ -122,21 +119,4 @@ void _encoder_sum_chars(char *msg, unsigned char *encrypted, const char *key,
     encrypted[i] = encrypted[i] % 256;
     key_iterator++;
   }
-}
-
-void encoder_decrypt(encoder_t *self, char *encrypted_msg, int key_iterator,
-                     unsigned char *decrypted_msg) {
-  switch (encoder_get_method(self)) {
-    case cesar:
-      _encoder_cesar(self, encrypted_msg, decrypted_msg, key_iterator, DECRYPT);
-      break;
-    case rc4:
-      _encoder_rc4(self, encrypted_msg, decrypted_msg, key_iterator);
-      break;
-    default:
-      _encoder_vigenere(self, encrypted_msg, decrypted_msg, key_iterator,
-                        DECRYPT);
-      break;
-  }
-  return;
 }

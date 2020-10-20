@@ -16,11 +16,11 @@ void server_init(server_t *self, const char *service) {
 void _server_connect(server_t *self, const char *service) {
   if (socket_bind_and_listen(&self->socket, service) < 0) {
     server_finish(self);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   if (socket_accept(&self->socket, &self->socket_peer) < 0) {
     server_finish(self);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -35,7 +35,7 @@ void server_decrypt(server_t *self, const char *method, const char *key) {
   encoder_t encoder;
   if (encoder_init(&encoder, method, key)) {
     server_finish(self);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   unsigned char encrypted_msg[CHUNK_SIZE + 1] = "\0";
   unsigned char decrypted_msg[CHUNK_SIZE + 1] = "\0";
@@ -45,8 +45,8 @@ void server_decrypt(server_t *self, const char *method, const char *key) {
     bytes_recv = socket_receive(&self->socket_peer, (char *)encrypted_msg,
                                 CHUNK_SIZE + 1);
     if (!bytes_recv) break;
-    encoder_decrypt(&encoder, (char *)encrypted_msg, key_iterator,
-                    decrypted_msg);
+    encoder_run(&encoder, (char *)encrypted_msg, decrypted_msg, key_iterator,
+                DECRYPT);
     printf("%s", decrypted_msg);
     memset(encrypted_msg, 0, CHUNK_SIZE);
   }

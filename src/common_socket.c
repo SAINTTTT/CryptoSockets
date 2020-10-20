@@ -2,6 +2,7 @@
 #include "common_socket.h"
 
 #include <errno.h>
+#include <math.h>
 #include <netdb.h>
 #include <stdbool.h>
 #include <stdio.h>
