@@ -66,11 +66,11 @@ void _encoder_rc4(encoder_t *self, char *msg, unsigned char *result) {
            self->j_status_rc4);
   if (strcmp((char *)self->characters_rc4, "0") == 0) {
     rc4_KSA(&rc4);
-    memcpy((char *)self->characters_rc4, (char *)rc4.characters, 255);
-  } else {
     rc4_init_characters(&rc4, self->characters_rc4);
   }
-  rc4_PRGA(&rc4, msg, result);
+  rc4_PRGA(&rc4, msg, result,
+           self->characters_rc4);  // el encoder guarda el estado de los
+                                   // caracteres rc4
   encoder_update_rc4_status(self, rc4.i_iterator, rc4.j_iterator);
 }
 

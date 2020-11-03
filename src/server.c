@@ -55,7 +55,7 @@ void server_decrypt(server_t *self, const char *method, const char *key) {
     if (!bytes_recv) break;
     encoder_run(&encoder, (char *)encrypted_msg, decrypted_msg, DECRYPT,
                 bytes_recv);
-    fwrite(encrypted_msg, 1, bytes_recv, stdout);
+    fwrite(decrypted_msg, 1, bytes_recv, stdout);
     memset(encrypted_msg, 0, CHUNK_SIZE);
   }
 }

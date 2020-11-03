@@ -26,20 +26,19 @@ void rc4_KSA(rc4_t* self) {
 }
 
 void rc4_init_characters(rc4_t* self, unsigned char* characters) {
-  memcpy((char*)self->characters, (char*)characters, 256);
+  memcpy((char*)characters, (char*)self->characters, 256);
 }
 
-void rc4_PRGA(rc4_t* self, char* msg, unsigned char* result) {
+void rc4_PRGA(rc4_t* self, char* msg, unsigned char* result,
+              unsigned char* characters) {
   for (int msg_iterator = 0; msg_iterator < CHUNK_SIZE; msg_iterator++) {
     self->i_iterator = (self->i_iterator + 1) & 255;
-    self->j_iterator =
-        (self->j_iterator + self->characters[self->i_iterator]) & 255;
-    _rc4_swap(self->characters, self->i_iterator, self->j_iterator);
+    self->j_iterator = (self->j_iterator + characters[self->i_iterator]) & 255;
+    _rc4_swap(characters, self->i_iterator, self->j_iterator);
     result[msg_iterator] =
-        msg[msg_iterator] ^
-        self->characters[(self->characters[self->i_iterator] +
-                          self->characters[self->j_iterator]) &
-                         255];
+        msg[msg_iterator] ^ characters[(characters[self->i_iterator] +
+                                        characters[self->j_iterator]) &
+                                       255];
   }
 }
 
