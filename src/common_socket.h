@@ -4,13 +4,12 @@
 
 typedef struct tcp_socket {
   int fd;
-  int mode;  // 1: Cliente --- 2: Servidor
 } tcp_socket_t;
 
-void socket_init(tcp_socket_t* self, int mode);
+void socket_init(tcp_socket_t* self);
 
 struct addrinfo* socket_getaddrinfo(const tcp_socket_t* self, const char* host,
-                                    const char* service);
+                                    const char* service, int mode);
 
 int socket_connect(tcp_socket_t* self, const char* host, const char* service);
 

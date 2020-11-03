@@ -13,21 +13,20 @@
 
 #define CANTIDAD_SOCKETS_LISTEN 20
 #define SOCKET_CLOSE 0
+#define CLIENT 1
+#define SERVER 2
 
-void socket_init(tcp_socket_t* self, int mode) {
-  self->fd = -1;
-  self->mode = mode;
-}
+void socket_init(tcp_socket_t* self) { self->fd = -1; }
 
 struct addrinfo* socket_getaddrinfo(const tcp_socket_t* self, const char* host,
-                                    const char* service) {
+                                    const char* service, int mode) {
   struct addrinfo hints;
   struct addrinfo* ai_list;
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;       /* IPv4 (or AF_INET6 for IPv6)     */
   hints.ai_socktype = SOCK_STREAM; /* TCP  (or SOCK_DGRAM for UDP)    */
   int err = 0;
-  if (self->mode == 1) {
+  if (mode == 1) {
     hints.ai_flags = 0;
     err = getaddrinfo(host, service, &hints, &ai_list);
   } else {
@@ -40,7 +39,7 @@ struct addrinfo* socket_getaddrinfo(const tcp_socket_t* self, const char* host,
 }
 
 int socket_connect(tcp_socket_t* self, const char* host, const char* service) {
-  struct addrinfo* ai_list = socket_getaddrinfo(self, host, service);
+  struct addrinfo* ai_list = socket_getaddrinfo(self, host, service, CLIENT);
   struct addrinfo* ptr;
   int err = 1;
   for (ptr = ai_list; ptr != NULL; ptr = ptr->ai_next) {
@@ -58,7 +57,7 @@ int socket_connect(tcp_socket_t* self, const char* host, const char* service) {
 }
 
 int socket_bind_and_listen(tcp_socket_t* self, const char* service) {
-  struct addrinfo* ai_list = socket_getaddrinfo(self, NULL, service);
+  struct addrinfo* ai_list = socket_getaddrinfo(self, NULL, service, SERVER);
   struct addrinfo* ptr;
   int val = 1, err = 1;
   for (ptr = ai_list; ptr != NULL; ptr = ptr->ai_next) {

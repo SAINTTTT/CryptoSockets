@@ -27,20 +27,11 @@ void _encoder_rc4(encoder_t *self, char *msg, unsigned char *encrypted);
 void _encoder_vigenere(encoder_t *self, char *msg, unsigned char *encrypted,
                        int mode, int readed);
 
-void _encoder_sum_chars(encoder_t *self, char *msg, unsigned char *encrypted,
-                        const char *key, unsigned int size_key, int mode,
-                        int readed);
-
 const char *encoder_get_key(encoder_t *self);
 
 enum CODIFICATION encoder_get_method(encoder_t *self);
 
-void _encoder_rc4_KSA(encoder_t *self, unsigned char *characters);
+void encoder_update_key_iterator(encoder_t *self, unsigned int key);
 
-void _encoder_swap(unsigned char *characters, unsigned int i, unsigned int j);
-
-void _encoder_rc4_PRGA(encoder_t *self, unsigned char *characters, char *msg,
-                       unsigned char *encrypted, unsigned int i_iterator,
-                       unsigned int j_iterator);
-
+void encoder_update_rc4_status(encoder_t *self, unsigned int i, unsigned int j);
 #endif

@@ -9,8 +9,7 @@ void server_init(server_t *self, const char *service);
 
 void _server_connect(server_t *self, const char *service);
 
-void server_run(server_t *self, const char *service, const char *method,
-                const char *key);
+void server_run(server_t *self, int argc, char **argv);
 
 void server_finish(server_t *self);
 

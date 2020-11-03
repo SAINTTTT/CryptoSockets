@@ -10,10 +10,9 @@ typedef struct {
   tcp_socket_t socket;
 } client_t;
 
-void client_init(client_t* self, const char* host, const char* service);
+void client_init(client_t* self, char* host, char* service);
 
-void client_run(client_t* self, const char* host, const char* service,
-                const char* method, const char* key);
+void client_run(client_t* self, int argc, char** argv);
 
 void _client_connect(client_t* self, const char* host, const char* service);
 

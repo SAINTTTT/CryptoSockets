@@ -36,4 +36,4 @@ CryptoSockets utiliza el protocolo TCP por medio sockets POSIX para realizar las
 
 
 > ## Diseño ##
-![diagrama de secuencia](./img/diagrama.png "Diagrama de secuencia")
+![diagrama de secuencia](./img/clasesTP1.png "Diagrama de secuencia")

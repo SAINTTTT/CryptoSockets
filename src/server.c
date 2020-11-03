@@ -1,5 +1,6 @@
 #include "server.h"
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +8,7 @@
 #include "common_encoder.h"
 
 void server_init(server_t *self, const char *service) {
-  socket_init(&self->socket, 2);
+  socket_init(&self->socket);
   _server_connect(self, service);
 }
 
@@ -22,8 +23,18 @@ void _server_connect(server_t *self, const char *service) {
   }
 }
 
-void server_run(server_t *self, const char *service, const char *method,
-                const char *key) {
+void server_run(server_t *self, int argc, char **argv) {
+  const char *service = argv[1];
+  struct option long_options[] = {
+      {"method", required_argument, 0, 0},
+      {"key", required_argument, 0, 0},
+  };
+
+  getopt_long(argc, argv, "service:--method:--key", long_options, &optind);
+  const char *method = optarg;
+  getopt_long(argc, argv, "service:--method:--key", long_options, &optind);
+  const char *key = optarg;
+
   server_init(self, service);
   server_decrypt(self, method, key);
   server_finish(self);
@@ -44,7 +55,7 @@ void server_decrypt(server_t *self, const char *method, const char *key) {
     if (!bytes_recv) break;
     encoder_run(&encoder, (char *)encrypted_msg, decrypted_msg, DECRYPT,
                 bytes_recv);
-    fwrite(decrypted_msg, 1, bytes_recv, stdout);
+    fwrite(encrypted_msg, 1, bytes_recv, stdout);
     memset(encrypted_msg, 0, CHUNK_SIZE);
   }
 }

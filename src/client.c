@@ -1,5 +1,6 @@
 #include "client.h"
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,13 +8,23 @@
 #include "common_encoder.h"
 
 // Devuelve el cliente conectado, listo para enviar bytes
-void client_init(client_t* self, const char* host, const char* service) {
-  socket_init(&self->socket, 1);
+void client_init(client_t* self, char* host, char* service) {
+  socket_init(&self->socket);
   _client_connect(self, host, service);
 }
 
-void client_run(client_t* self, const char* host, const char* service,
-                const char* method, const char* key) {
+void client_run(client_t* self, int argc, char** argv) {
+  struct option long_options[] = {
+      {"method", required_argument, 0, 0},
+      {"key", required_argument, 0, 0},
+  };
+  char* host = argv[1];
+  char* service = argv[2];
+  getopt_long(argc, argv, "host:service:--method:--key", long_options, &optind);
+  const char* method = optarg;
+  getopt_long(argc, argv, "host:service:--method:--key", long_options, &optind);
+  const char* key = optarg;
+
   client_init(self, host, service);
   _client_encrypt_file(self, method, key);
   client_finish(self);
